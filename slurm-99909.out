@@ -1,0 +1,94 @@
+Lmod has detected the following error: The following module(s) are unknown:
+"mpt"
+
+Please check the spelling or version number. Also try "module spider ..."
+It is also possible your cache file is out-of-date; it may help to try:
+  $ module --ignore_cache load "mpt"
+
+Also make sure that all modulefiles written in TCL start with the string
+#%Module
+
+
+
+================================
+Strong Scaling Test
+GRID_SIZE=40, DAYS=20
+================================
+--- 1 process ---
+Day,Prey,Predators
+0,156497,300
+1,156246,871
+2,156111,2183
+3,152282,5269
+4,135375,9828
+5,100403,13375
+6,72249,12191
+7,92888,9620
+8,122538,14000
+9,57580,13581
+10,75591,7450
+11,144313,11939
+12,74953,15620
+13,59047,8690
+14,142818,9301
+15,102154,16348
+16,55132,11162
+17,104273,8031
+18,128744,14766
+19,61597,13845
+Time: 14.314 seconds
+
+--- 2 processes ---
+Day,Prey,Predators
+0,150723,261
+1,150640,661
+2,150041,1719
+3,148796,3806
+4,139759,8012
+5,115050,14052
+6,57309,13034
+7,81093,7543
+8,129064,11806
+9,74707,14623
+10,63780,8670
+11,132863,10160
+12,88341,15713
+13,52836,9591
+14,129783,8004
+15,112188,14290
+16,58243,12387
+17,91803,7965
+18,121447,13227
+19,64310,14002
+Time: 7.259 seconds
+
+--- 4 processes ---
+Day,Prey,Predators
+0,142978,290
+1,142340,892
+2,140831,2180
+3,138479,4385
+4,130913,9022
+5,106564,14637
+6,55576,11698
+7,94741,7819
+8,121113,12499
+9,65070,14415
+10,66951,8081
+11,128379,10243
+12,96081,15172
+13,57311,10486
+14,117037,8578
+15,113503,13851
+16,59171,12861
+17,78823,7969
+18,124556,11646
+19,75287,15057
+Time: 3.604 seconds
+
+--- 8 processes ---
+srun: warning: can't honor --ntasks-per-node set to 4 which doesn't match the requested tasks 8 with the maximum number of requested nodes 1. Ignoring --ntasks-per-node.
+Error: grid_rows (40) must be divisible by total_actors (16).
+srun: error: cs-n0200: tasks 0-7: Exited with exit code 1
+srun: Terminating StepId=99909.3
+

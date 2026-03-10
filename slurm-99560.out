@@ -1,0 +1,19 @@
+Lmod has detected the following error: The following module(s) are unknown:
+"mpt"
+
+Please check the spelling or version number. Also try "module spider ..."
+It is also possible your cache file is out-of-date; it may help to try:
+  $ module --ignore_cache load "mpt"
+
+Also make sure that all modulefiles written in TCL start with the string
+#%Module
+
+
+
+Current working directory: /mnt/lustre/e1000/home/m25oc/m25oc/s2799314/seperate
+Starting MPI simulation...
+Day,Prey,Predators
+0,0,2244
+[2026-03-10T15:12:21.003] error: *** STEP 99560.0 ON cs-n0177 CANCELLED AT 2026-03-10T15:12:21 DUE TO TIME LIMIT ***
+[2026-03-10T15:12:21.004] error: *** JOB 99560 ON cs-n0177 CANCELLED AT 2026-03-10T15:12:21 DUE TO TIME LIMIT ***
+srun: Job step aborted: Waiting up to 32 seconds for job step to finish.

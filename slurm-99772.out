@@ -1,0 +1,35 @@
+Lmod has detected the following error: The following module(s) are unknown:
+"mpt"
+
+Please check the spelling or version number. Also try "module spider ..."
+It is also possible your cache file is out-of-date; it may help to try:
+  $ module --ignore_cache load "mpt"
+
+Also make sure that all modulefiles written in TCL start with the string
+#%Module
+
+
+
+Current working directory: /mnt/lustre/e1000/home/m25oc/m25oc/s2799314/seperate
+Starting MPI simulation...
+Day,Prey,Predators
+0,287403,296
+1,287114,93
+2,286905,14
+3,288139,2
+4,287373,0
+5,287246,0
+6,286873,0
+7,287370,0
+8,287277,0
+9,286763,0
+10,288392,0
+11,287307,0
+12,286870,0
+13,287467,0
+14,287506,0
+15,287549,0
+16,287167,0
+17,286738,0
+18,287055,0
+19,287484,0

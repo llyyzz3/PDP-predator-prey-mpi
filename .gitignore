@@ -1,0 +1,4 @@
+echo "predator_sim" > .gitignore
+echo "*.o" >> .gitignore
+echo "*.out" >> .gitignore
+echo "*.txt" >> .gitignore
