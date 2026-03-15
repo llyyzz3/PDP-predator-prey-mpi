@@ -7,12 +7,12 @@
 #SBATCH --partition=standard
 #SBATCH --qos=standard
 
-# 加载 Cirrus 推荐的 MPI 环境
+# Load the recommended MPI environment for Cirrus HPC cluster
 module load mpt
 
-# 确保你在工作目录下执行
+# Ensure the script is executed in the current working directory
 echo "Current working directory: $(pwd)"
-echo "Starting MPI simulation..."
+echo "Starting distributed predator prey MPI simulation..."
 
-# 运行你刚刚编译出来的 predator_sim 可执行文件
+# Run the compiled executable using srun
 srun --unbuffered ./predator_sim

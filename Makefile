@@ -1,16 +1,17 @@
 # =============================================================================
-# Makefile - Parallel Predator-Prey Simulation (Actor Pattern)
+# Makefile - Parallel Predator-Prey Simulation Using Actor Pattern
 #
 # Targets:
-#   make              - build default executable (predator_sim)
-#   make clean        - remove all build artefacts and executables
+#   make              - build default executable predator_sim
+#   make clean        - remove all build artifacts and executables
 #
 # Simulation parameters can be overridden at compile time using -D flags.
 # Example:
 #   make GRID=160 PREY=256000 PRED=6400
 #
-# Target machine: Cirrus (EPCC)
-# Compiler:       mpicc (SGI MPT)  -- load with: module load mpt
+# Target machine: Cirrus HPC Cluster
+# Compiler:       mpicc using SGI MPT 
+# Load module:    module load mpt
 # =============================================================================
 
 CC      = mpicc
@@ -19,8 +20,7 @@ TARGET  = predator_sim
 SRCS    = main.c actor_framework.c predator_model.c
 OBJS    = $(SRCS:.c=.o)
 
-# Optional parameter overrides (used for scaling experiments)
-# Usage: make GRID=160 PREY=256000 PRED=6400
+# Optional parameter overrides for scaling experiments
 GRID ?=
 PREY ?=
 PRED ?=
@@ -52,4 +52,4 @@ actor_framework.o: actor_framework.h
 predator_model.o:  predator_model.h actor_framework.h
 
 clean:
-	rm -f $(OBJS) $(TARGET) predator_sim_g40 predator_sim_g80 predator_sim_g160 predator_sim_strong
+	rm -f $(OBJS) $(TARGET)

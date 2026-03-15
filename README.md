@@ -1,177 +1,78 @@
-# Parallel Predator-Prey Simulation — Actor Pattern
+# Distributed Predator Prey Simulation Using Actor Pattern
 
-A parallel implementation of a predator-prey simulation using the **Actor
-Pattern** with MPI for distributed-memory parallelism.  Written in C for
-the Parallel Design Patterns coursework (Part Two).
+This project implements a distributed predator prey simulation system based on the Actor pattern. The code separates the distributed execution framework from the domain specific ecological model. It supports running multiple Actors per MPI process to achieve finer grained spatial partitioning.
 
----
+## 1. Target Platform and Compiler Requirements
 
-## Project Structure
+According to the coursework requirements, this project is explicitly configured and tested for the following computing platform and compiler.
 
-```
-.
-├── actor_framework.h      # Generic Actor framework API (model-agnostic)
-├── actor_framework.c      # Framework implementation: routing, MPI, mailbox
-├── predator_model.h       # Predator-prey model parameters and public API
-├── predator_model.c       # Model logic: movement, predation, birth, death
-├── main.c                 # Entry point: wires framework and model together
-├── Makefile               # Build system
-├── submit.sh              # Job submission script (Cirrus)
-└── README.md              # This file
-```
+- Target Machine: Cirrus HPC Cluster.
 
----
+- Compiler: mpicc using the SGI Message Passing Toolkit library.
 
-## Design Overview
+- Programming Language: C language compliant with the C11 standard.
 
-The code is split into two clearly separated layers:
+## 2. Build and Submission Scripts
 
-**Actor Framework** (`actor_framework.h/c`)
-- Manages Actor lifecycle, mailboxes, and message routing
-- Handles all MPI communication between processes
-- Completely model-agnostic — contains no predator-prey logic
-- Model behaviour is injected via four callback functions:
-  - `ModelMoveFn`    — movement phase (before MPI exchange)
-  - `ModelEcologyFn` — ecology phase (after MPI exchange)
-  - `ModelMailboxFn` — handles incoming messages
-  - `ModelCountFn`   — reports population counts
+The project includes the required files for building the code and running the executable on Cirrus compute nodes.
 
-**Predator-Prey Model** (`predator_model.h/c`)
-- Implements Lotka-Volterra predator-prey dynamics on a 2D grid
-- Each Actor owns a horizontal band of the global grid
-- Registers its callbacks with the framework via `model_register()`
+- Makefile: A makefile is included for building the code. It compiles the source files into the final executable named predator_sim.
 
-Each MPI process (UE) manages `ACTORS_PER_UE` Actors.  Messages between
-Actors on the same process are delivered directly to the mailbox without
-any MPI overhead (internal routing).  Cross-process messages are exchanged
-via `MPI_Sendrecv`.
+- submit.sh: A submission script is included to run your executable on Cirrus. It is configured with the appropriate Slurm directives to request compute nodes and execute the parallel simulation.
 
----
+## 3. Project File Structure
 
-## Requirements
+- actor_framework.h and actor_framework.c: These files contain the Actor runtime framework layer. This layer is responsible for Actor lifecycle management, MPI inter process communication, and local or cross process message routing.
 
-- MPI library (SGI MPT on Cirrus, or OpenMPI locally)
-- C compiler with C11 support
-- `GRID_SIZE` must be divisible by `num_processes × ACTORS_PER_UE`
+- predator_model.h and predator_model.c: These files contain the domain simulation model layer. This layer defines ecological behavior rules such as animal movement, reproduction, predation, and death.
 
----
+- main.c: The main entry point of the program. It is responsible for initializing MPI and registering model callback functions into the framework.
 
-## Building
+## 4. How to Build the Code
 
-**On Cirrus:**
+Before compiling this code on the Cirrus cluster, you must load the SGI MPT module. Please execute the following command in your terminal.
+
 ```bash
 module load mpt
-make
 ```
 
-**Locally (with OpenMPI):**
+After loading the module, you can compile the code using the included Makefile.
+
 ```bash
-# Install OpenMPI first: brew install open-mpi (Mac) or apt install libopenmpi-dev (Ubuntu)
 make
 ```
 
-**With custom parameters:**
+**Custom Compilation Parameters:**
+You can override macro definitions during compilation to change the initial simulation parameters. This is very useful when conducting performance and scalability tests.
+
 ```bash
 make GRID=160 PREY=256000 PRED=6400
 ```
 
----
+## 5. How to Run the Code
 
-## Running
+To ensure that the global two dimensional grid can be evenly divided among all Actors, the grid size must be perfectly divisible by the product of the number of processes and the number of actors per process. By default, the framework configures two actors per process.
 
-**Locally:**
-```bash
-mpirun -n 4 ./predator_sim
-```
+You can submit the job to the Cirrus compute nodes using the provided submission script.
 
-**On Cirrus (via Slurm):**
 ```bash
 sbatch submit.sh
 ```
 
-Check output:
+If you have already requested an interactive compute node, you can also run the program directly using mpirun. For instance, to run with 4 processes, use the following command.
+
 ```bash
-cat slurm-*.out
+mpirun -n 4 ./predator_sim
 ```
 
----
+## 6. Output Format
 
-## Simulation Parameters
+The simulation will output the total number of surviving prey and predators globally to the terminal at the end of each simulation day. 
 
-All parameters are defined in `predator_model.h` and can be overridden
-at compile time with `-D` flags:
-
-| Parameter | Default | Description |
-|-----------|---------|-------------|
-| `GRID_SIZE` | 40 | Width and height of the global grid |
-| `MAX_PER_CELL` | 200 | Max animals per cell (prey and predators separate) |
-| `INITIAL_PREY` | 16000 | Initial prey population |
-| `INITIAL_PREDATORS` | 400 | Initial predator population |
-| `STEPS_PER_DAY` | 50 | Simulation steps per day |
-| `DAYS` | 20 | Number of days to simulate |
-| `ACTORS_PER_UE` | 2 | Number of Actors per MPI process |
-
-**Lotka-Volterra parameters** (in `predator_model.c`):
-
-| Parameter | Value | Description |
-|-----------|-------|-------------|
-| `ALPHA` | 0.06 | Prey birth probability per step |
-| `BETA` | 0.01 | Predator hunt success probability per step |
-| `DELTA` | 0.1 | Predator birth probability after successful hunt |
-| `GAMMA` | 0.04 | Predator natural death probability per step |
-
----
-
-## Output Format
-
-The simulation prints population counts in CSV format once per day:
-
-```
+```bash
 Day,Prey,Predators
-0,16000,400
-1,18432,812
+0,64000,1600
+1,68432,1812
 ...
-Total simulation time: 3.214 seconds
+Time: 25.427 seconds
 ```
-
----
-
-## Scaling Experiments
-
-For strong scaling (fixed problem, increasing processes):
-```bash
-# Compile once
-make GRID=160 PREY=256000 PRED=6400 TARGET=predator_sim_strong
-
-# Run with 1, 2, 4, 8 processes
-mpirun -n 1 ./predator_sim_strong
-mpirun -n 4 ./predator_sim_strong
-mpirun -n 8 ./predator_sim_strong
-```
-
-For weak scaling (fixed work per process):
-```bash
-make GRID=40  PREY=16000  PRED=400  TARGET=predator_sim_g40
-make GRID=80  PREY=64000  PRED=1600 TARGET=predator_sim_g80
-make GRID=160 PREY=256000 PRED=6400 TARGET=predator_sim_g160
-
-mpirun -n 1  ./predator_sim_g40
-mpirun -n 4  ./predator_sim_g80
-mpirun -n 16 ./predator_sim_g160
-```
-
----
-
-## Constraint
-
-`GRID_SIZE` must satisfy: `GRID_SIZE % (num_processes × ACTORS_PER_UE) == 0`
-
-Valid combinations with `ACTORS_PER_UE=2`:
-
-| Processes | Min GRID_SIZE divisor | Example GRID_SIZE |
-|-----------|----------------------|-------------------|
-| 1 | 2 | 40 |
-| 2 | 4 | 40, 80 |
-| 4 | 8 | 40, 80, 160 |
-| 8 | 16 | 80, 160 |
-| 16 | 32 | 160 |

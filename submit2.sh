@@ -32,3 +32,6 @@ srun -n 4 ./predator_sim_strong
 echo "--- 8 processes ---"
 srun -n 8 ./predator_sim_strong
 
+echo "--- 16 processes ---"
+srun -n 16 ./predator_sim_strong
+
